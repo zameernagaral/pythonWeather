@@ -46,6 +46,18 @@ Open your browser and navigate to:
 
 ---
 
+## 🌐 How to Deploy (Vercel)
+
+This project has been pre-configured with a `vercel.json` file, allowing you to deploy it to the cloud for free with **zero sleep delays**!
+
+1. Go to [Vercel](https://vercel.com) and log in with your GitHub account.
+2. Click **Add New...** -> **Project**.
+3. Import the `pythonWeather` repository.
+4. Click **Deploy** (Vercel automatically detects the Flask configuration and deploys it as a serverless Python function).
+5. Once deployment is complete, Vercel will give you a live production URL!
+
+---
+
 ## 🎓 Lab Viva / Teacher Q&A Preparation
 
 Here are questions your Python Lab Teacher might ask and how to answer them:
