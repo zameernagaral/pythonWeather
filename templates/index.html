@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Real-Time Weather Monitoring</title>
+    <!-- Google Fonts for premium, warm, human typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="{{ theme }}">
+
+    <header class="app-header">
+        <div class="logo-area">
+            <span class="logo-icon">☁️</span>
+            <h1>Python Weather Monitor</h1>
+        </div>
+        <p class="tagline">A real-time meteorological dashboard built with Python & Flask</p>
+    </header>
+
+    <main class="main-container">
+        
+        <!-- Search & Control Section -->
+        <section class="control-panel card">
+            <form action="/" method="POST" class="search-form">
+                <!-- Keep track of units when searching -->
+                <input type="hidden" name="units" value="{{ current_unit }}">
+                
+                <div class="search-box">
+                    <label for="city-input" class="sr-only">Enter city name</label>
+                    <input 
+                        type="text" 
+                        id="city-input" 
+                        name="city" 
+                        class="input-field" 
+                        placeholder="e.g. Mumbai, Tokyo, London..." 
+                        value="{{ current_city }}" 
+                        required
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="btn btn-search">Search Weather</button>
+                </div>
+            </form>
+
+            <!-- Unit Toggler (Visible if a city has been searched) -->
+            {% if weather %}
+            <div class="unit-toggle">
+                <span>Temperature Unit:</span>
+                <div class="toggle-buttons">
+                    <a href="{{ url_for('index', city=current_city, units='c') }}" class="toggle-btn {% if current_unit == 'c' %}active{% endif %}">°C (Celsius)</a>
+                    <a href="{{ url_for('index', city=current_city, units='f') }}" class="toggle-btn {% if current_unit == 'f' %}active{% endif %}">°F (Fahrenheit)</a>
+                </div>
+            </div>
+            {% endif %}
+        </section>
+
+        <!-- Error Message Alert -->
+        {% if error %}
+        <div class="alert alert-error card">
+            <span class="alert-icon">⚠️</span>
+            <div class="alert-content">
+                <h3>Search Failed</h3>
+                <p>{{ error }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Dashboard Layout -->
+        <div class="dashboard-grid">
+            
+            <!-- Left Column: Weather Display & Recommendations -->
+            <div class="dashboard-main">
+                {% if weather %}
+                <!-- Primary Weather Display Card -->
+                <section class="weather-hero card">
+                    <div class="hero-top">
+                        <div class="location-details">
+                            <h2 class="city-title">{{ weather.city }}, <span class="country-code">{{ weather.country }}</span></h2>
+                            <p class="weather-condition">{{ weather.description }}</p>
+                        </div>
+                        <div class="temp-display">
+                            <span class="temp-value">{{ weather.temp }}</span>
+                            <span class="temp-unit">{{ weather.unit }}</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Recommendations / Smart Advice Card -->
+                <section class="recommendations card">
+                    <h3 class="section-title">💡 Smart Suggestions (Python Powered)</h3>
+                    
+                    <div class="advice-grid">
+                        <div class="advice-item">
+                            <div class="advice-icon">🧥</div>
+                            <div class="advice-text">
+                                <strong>Suggested Clothing</strong>
+                                <p>{{ weather.recommendations.clothing }}</p>
+                            </div>
+                        </div>
+                        <div class="advice-item">
+                            <div class="advice-icon">🚶</div>
+                            <div class="advice-text">
+                                <strong>Activities & Outdoors</strong>
+                                <p>{{ weather.recommendations.activity }}</p>
+                            </div>
+                        </div>
+                        <div class="advice-item">
+                            <div class="advice-icon">❤️</div>
+                            <div class="advice-text">
+                                <strong>Health Tip</strong>
+                                <p>{{ weather.recommendations.health_tip }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Detailed Parameters Grid -->
+                <section class="detailed-metrics card">
+                    <h3 class="section-title">📊 Detailed Meteorological Indicators</h3>
+                    
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <span class="metric-label">Atmospheric Pressure</span>
+                            <span class="metric-value">{{ weather.pressure }} <span class="metric-unit">hPa</span></span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Relative Humidity</span>
+                            <span class="metric-value">{{ weather.humidity }} <span class="metric-unit">%</span></span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Wind Speed</span>
+                            <span class="metric-value">{{ weather.wind_speed }} <span class="metric-unit">m/s</span></span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Wind Direction</span>
+                            <span class="metric-value">{{ weather.wind_deg }} <span class="metric-unit">°</span></span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Ground Level Pressure</span>
+                            <span class="metric-value">{{ weather.grnd_level }} {% if weather.grnd_level != 'N/A' %}<span class="metric-unit">hPa</span>{% endif %}</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Sea Level Pressure</span>
+                            <span class="metric-value">{{ weather.sea_level }} {% if weather.sea_level != 'N/A' %}<span class="metric-unit">hPa</span>{% endif %}</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Latitude</span>
+                            <span class="metric-value">{{ weather.lat }} <span class="metric-unit">°</span></span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Longitude</span>
+                            <span class="metric-value">{{ weather.lon }} <span class="metric-unit">°</span></span>
+                        </div>
+                    </div>
+                </section>
+                {% else %}
+                <!-- Blank State (Prompt User to Search) -->
+                <section class="blank-state card">
+                    <div class="blank-icon">🌍</div>
+                    <h2>No Weather Data Loaded</h2>
+                    <p>Enter a city name in the search box above to fetch current weather details and smart clothing recommendations in real-time.</p>
+                </section>
+                {% endif %}
+            </div>
+
+            <!-- Right Column: History Sidebar -->
+            <aside class="dashboard-sidebar">
+                <div class="history-card card">
+                    <div class="history-header">
+                        <h3>Recent Searches</h3>
+                        {% if history %}
+                        <a href="{{ url_for('clear_history', city=current_city, units=current_unit) }}" class="clear-history-btn">Clear</a>
+                        {% endif %}
+                    </div>
+                    
+                    {% if history %}
+                    <ul class="history-list">
+                        {% for item in history %}
+                        <li>
+                            <a href="{{ url_for('index', city=item.split(',')[0], units=current_unit) }}" class="history-link">
+                                <span class="history-icon">📍</span>
+                                <span class="history-name">{{ item }}</span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="empty-history-text">No recent searches. Your search history will appear here.</p>
+                    {% endif %}
+                </div>
+            </aside>
+
+        </div>
+
+        <!-- LAB PROJECT PRESENTATION & Q&A GUIDE (Collapsible details) -->
+        <section class="lab-guide card">
+            <details>
+                <summary class="lab-guide-summary">
+                    <span class="guide-title">🎓 Lab Evaluation & Code Tour Guide</span>
+                    <span class="guide-subtitle">(Click to expand notes for your teacher)</span>
+                </summary>
+                
+                <div class="guide-content">
+                    <div class="guide-intro">
+                        <p>This application was designed to showcase clean, structured, and modular Python programming. Here is an overview of how the app functions to help you explain it to your lab instructor:</p>
+                    </div>
+                    
+                    <div class="guide-sections">
+                        <div class="guide-block">
+                            <h4>1. Request Flow (How it Works)</h4>
+                            <ol>
+                                <li>The user inputs a city name and submits the form (HTML).</li>
+                                <li>The form is sent as a `POST` request to the Flask server (`app.py`).</li>
+                                <li>The backend converts this to a `GET` request with query params (`?city=Name&units=c`) for clean URL routing.</li>
+                                <li>Flask triggers the `index()` view function, extracts the parameters, and queries the OpenWeatherMap API using Python's standard `urllib` library.</li>
+                                <li>The API returns a JSON payload which Python's standard `json` module parses into a native Python dictionary.</li>
+                                <li>Python logic computes unit conversions, runs the recommendation conditional checks, updates the search history list, and passes all variables to the Jinja2 engine, which compiles the styled HTML page.</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="guide-block">
+                            <h4>2. Key Python Concepts Used</h4>
+                            <ul>
+                                <li><strong>Libraries:</strong> `urllib.request` (making HTTP queries without external libraries), `json` (parsing strings into dictionary structures), and `flask` (web framework, sessions, and HTML templates).</li>
+                                <li><strong>Dictionary Parsing:</strong> Extracting nested elements using safe `.get()` calls (e.g. `data.get("wind", {}).get("speed")`) to prevent server crashes if the API misses some data.</li>
+                                <li><strong>Flask Sessions:</strong> Utilizes browser cookie sessions (`session["history"]`) to persist recent searches client-side. Flask automatically encrypts this list using a server-defined secret key.</li>
+                                <li><strong>Conditional Logic:</strong> If-elif-else statements used in `generate_recommendations()` to inspect metrics (temperatures, wind speed, and weather descriptions) and dynamically generate localized advice.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </section>
+
+    </main>
+
+    <footer class="app-footer">
+        <p>Python Real-Time Weather Monitoring &copy; 2026. Made as a First Year Engineering Python Project.</p>
+    </footer>
+
+</body>
+</html>
